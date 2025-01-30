@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Teacher\ExampController;
+use App\Http\Controllers\Teacher\ExamController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,5 +21,5 @@ Route::group([
     'prefix' => 'teacher',
     'as' => 'teacher.'
 ], function () {
-    Route::resource('examp', ExampController::class);
+    Route::resource('exam', ExamController::class);
 });
