@@ -20,6 +20,8 @@
     </div>
     <!-- end page title -->
 
+    <form method="POST" action="{{ route('teacher.question.store')}}">
+    @csrf
     <div class="row">
         <div class="col-xl-9 col-lg-8">
             <div class="card">
@@ -32,17 +34,10 @@
                     <div class="col-6 my-2 mr-2">
                         <div class="d-flex flex-row-reverse bd-highlight">
                             <div class="p-1 bd-highlight">
-                                <button type="button" class="btn btn-primary btn-sm mx-2">Simpan & Lanjutkan</button>
+                                <button type="button" class="btn btn-primary btn-sm me-2">Simpan & Lanjutkan</button>
                             </div>
                             <div class="p-1 bd-highlight">
-                                <button type="button" class="btn btn-light btn-sm">Simpan & Selesai</button>
-                            </div>
-                            <div class="p-1 bd-highlight">
-                                <select class="form-select form-select-sm">
-                                    <option value="1">Pilihan Ganda</option>
-                                    <option value="2">Isian Singkat</option>
-                                    <option value="3">Esai</option>
-                                </select>
+                                <button type="submit" class="btn btn-light btn-sm">Simpan & Selesai</button>
                             </div>
                         </div>
                     </div>
@@ -67,7 +62,7 @@
                         <div>
                             <div class="row justify-content-center">
                                 <div class="col-xl-12">
-                                        <textarea id="elm1">&lt;p&gt;Welcome to the TinyMCE jQuery example!&lt;/p&gt;</textarea>
+                                        <textarea name="soal" id="elm1">&lt;p&gt;Welcome to the TinyMCE jQuery example!&lt;/p&gt;</textarea>
                                 </div>
                             </div>
                         </div>
@@ -131,37 +126,28 @@
 
         <div class="col-xl-3 col-lg-4">
             <div class="card">
+                <h5 class="card-header bg-white text-center border-bottom">
+                    PENGATURAN SOAL
+                </h5>
                 <div class="card-body p-4">
-                    <div class="search-box">
-                        <p class="text-muted">Search</p>
-                        <div class="position-relative">
-                            <input type="text" class="form-control rounded bg-light border-light"
-                                placeholder="Search...">
-                            <i class="mdi mdi-magnify search-icon"></i>
-                        </div>
+                    <div class="mb-3">
+                        <label for="formrow-firstname-input" class="form-label">Jenis Soal</label>
+                        <select class="form-select" id="formrow-firstname-input">
+                            <option value="1">Pilihan Ganda</option>
+                            <option value="2">Isian Singkat</option>
+                            <option value="3">Esai</option>
+                        </select>
                     </div>
-
-                    <hr class="my-4">
-
-                    <div>
-                        <p class="text-muted">Categories</p>
-
-                        <ul class="list-unstyled fw-medium">
-                            <li><a href="javascript: void(0);" class="text-muted py-2 d-block"><i
-                                        class="mdi mdi-chevron-right me-1"></i> Design</a></li>
-                            <li><a href="javascript: void(0);" class="text-muted py-2 d-block"><i
-                                        class="mdi mdi-chevron-right me-1"></i> Development <span
-                                        class="badge badge-soft-success rounded-pill float-end ms-1 font-size-12">04</span></a>
-                            </li>
-                            <li><a href="javascript: void(0);" class="text-muted py-2 d-block"><i
-                                        class="mdi mdi-chevron-right me-1"></i> Business</a></li>
-                            <li><a href="javascript: void(0);" class="text-muted py-2 d-block"><i
-                                        class="mdi mdi-chevron-right me-1"></i> Project</a></li>
-                            <li><a href="javascript: void(0);" class="text-muted py-2 d-block"><i
-                                        class="mdi mdi-chevron-right me-1"></i> Travel<span
-                                        class="badge badge-soft-success rounded-pill ms-1 float-end font-size-12">12</span></a>
-                            </li>
-                        </ul>
+                    <div class="mb-3">
+                        <label for="formrow-firstname-input" class="form-label">Bobot Soal</label>
+                        <input type="number" min="1" class="form-control" id="formrow-firstname-input" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="formrow-firstname-input" class="form-label">Penilaian Otomatis</label>
+                        <div>
+                            <input type="checkbox" id="switch1" switch="none" checked />
+                            <label for="switch1" data-on-label="On" data-off-label="Off"></label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -169,6 +155,7 @@
         </div>
     </div>
     <!-- end row -->
+    </form>
 </div>
 @endsection
 
@@ -191,7 +178,42 @@
         height: 500,
         plugins: ["advlist", "autolink", "lists", "link", "image", "charmap", "preview", "anchor", "searchreplace", "visualblocks", "code", "fullscreen", "insertdatetime", "media", "table", "wordcount"],
         toolbar: "undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat",
-        content_style: 'body { font-family:"Poppins",sans-serif; font-size:16px }'
+        content_style: 'body { font-family:"Poppins",sans-serif; font-size:16px }',
+        images_upload_url: '/teacher/upload-image',
+        images_upload_credentials: true, // Untuk kirim CSRF token
+        file_picker_types: 'image',
+        automatic_uploads: true,
+
+        // Kirim CSRF token dengan setiap request
+        setup: function (editor) {
+            editor.on('init', function () {
+                editor.getElement().setAttribute('data-csrf', '{{ csrf_token() }}');
+            });
+        },
+
+        images_upload_handler: function (blobInfo, success, failure) {
+            let formData = new FormData();
+            formData.append('image', blobInfo.blob(), blobInfo.filename());
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
+            fetch('/teacher/upload-image', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result.location);
+                if (result.location) {
+                    success(result.location); // Kirim URL gambar kembali ke editor
+                } else {
+                    failure('Upload gagal');
+                }
+            })
+            .catch(() => failure('Upload error'));
+        }
     });
 
     // tinymce editor jawaban

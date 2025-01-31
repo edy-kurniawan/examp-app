@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Teacher\ExamController;
+use App\Http\Controllers\Teacher\QuestionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,4 +23,6 @@ Route::group([
     'as' => 'teacher.'
 ], function () {
     Route::resource('exam', ExamController::class);
+    Route::resource('question', QuestionController::class);
+    Route::post('upload-image', [QuestionController::class, 'uploadImage'])->name('upload-image');
 });

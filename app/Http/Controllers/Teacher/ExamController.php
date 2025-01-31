@@ -25,7 +25,7 @@ class ExamController extends Controller
      */
     public function create()
     {
-        return view('teacher.exam.create');
+        //
     }
 
     /**
@@ -52,7 +52,7 @@ class ExamController extends Controller
      */
     public function show(string $id)
     {
-        //
+        return view('teacher.exam.show');
     }
 
     /**
