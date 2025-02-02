@@ -22,6 +22,7 @@
 
     <form method="POST" action="{{ route('teacher.question.store')}}">
     @csrf
+    <input type="hidden" name="exam_id" value="{{ $exam_id }}">
     <div class="row">
         <div class="col-xl-9 col-lg-8">
             <div class="card">
@@ -86,32 +87,32 @@
                                                     <img src="https://ui-avatars.com/api/?name=A&size=32&background=EBF4FF&color=7F9CF5&bold=true"
                                                         alt="user-image" class="me-1 rounded-circle">
                                                 </th>
-                                                <td><textarea class="form-control tiny-editor" name="jawaban"></textarea></td>
-                                                <td><input type="radio" name="jawaban_benar" value="1"></td>
+                                                <td><textarea class="form-control tiny-editor" name="jawaban_a"></textarea></td>
+                                                <td><input type="radio" name="is_true" value="a"></td>
                                             </tr>
                                             <tr>
                                                 <th scope="row">
                                                     <img src="https://ui-avatars.com/api/?name=B&size=32&background=EBF4FF&color=7F9CF5&bold=true"
                                                         alt="user-image" class="me-1 rounded-circle">
                                                 </th>
-                                                <td><textarea class="form-control tiny-editor" name="jawaban"></textarea></td>
-                                                <td><input type="radio" name="jawaban_benar" value="1"></td>
+                                                <td><textarea class="form-control tiny-editor" name="jawaban_b"></textarea></td>
+                                                <td><input type="radio" name="is_true" value="b"></td>
                                             </tr>
                                             <tr>
                                                 <th scope="row">
                                                     <img src="https://ui-avatars.com/api/?name=C&size=32&background=EBF4FF&color=7F9CF5&bold=true"
                                                         alt="user-image" class="me-1 rounded-circle">
                                                 </th>
-                                                <td><textarea class="form-control tiny-editor" name="jawaban"></textarea></td>
-                                                <td><input type="radio" name="jawaban_benar" value="1"></td>
+                                                <td><textarea class="form-control tiny-editor" name="jawaban_c"></textarea></td>
+                                                <td><input type="radio" name="is_true" value="c"></td>
                                             </tr>
                                             <tr>
                                                 <th scope="row">
                                                     <img src="https://ui-avatars.com/api/?name=D&size=32&background=EBF4FF&color=7F9CF5&bold=true"
                                                         alt="user-image" class="me-1 rounded-circle">
                                                 </th>
-                                                <td><textarea class="form-control tiny-editor" name="jawaban"></textarea></td>
-                                                <td><input type="radio" name="jawaban_benar" value="1"></td>
+                                                <td><textarea class="form-control tiny-editor" name="jawaban_d"></textarea></td>
+                                                <td><input type="radio" name="is_true" value="d"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -140,7 +141,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Bobot Soal</label>
-                        <input type="number" min="1" class="form-control" id="formrow-firstname-input" value="1">
+                        <div class="input-group">
+                            <input type="number" class="form-control" name="" id="formrow-firstname-input" value="1">
+                            <div class="input-group-text">%</div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Penilaian Otomatis</label>
@@ -179,41 +183,36 @@
         plugins: ["advlist", "autolink", "lists", "link", "image", "charmap", "preview", "anchor", "searchreplace", "visualblocks", "code", "fullscreen", "insertdatetime", "media", "table", "wordcount"],
         toolbar: "undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat",
         content_style: 'body { font-family:"Poppins",sans-serif; font-size:16px }',
-        images_upload_url: '/teacher/upload-image',
-        images_upload_credentials: true, // Untuk kirim CSRF token
-        file_picker_types: 'image',
-        automatic_uploads: true,
+        images_upload_handler: function (blobInfo) {
+            return new Promise((resolve, reject) => {
+                let formData = new FormData();
+                formData.append('file', blobInfo.blob());
 
-        // Kirim CSRF token dengan setiap request
-        setup: function (editor) {
-            editor.on('init', function () {
-                editor.getElement().setAttribute('data-csrf', '{{ csrf_token() }}');
+                $.ajax({
+                    url: '/teacher/upload-image',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.location) {
+                            resolve(response.location); // ✅ TinyMCE menggunakan URL, bukan Base64
+                        } else {
+                            reject('Gagal mengunggah gambar');
+                        }
+                    },
+                    error: function() {
+                        reject('Terjadi kesalahan saat mengunggah');
+                    }
+                });
             });
         },
-
-        images_upload_handler: function (blobInfo, success, failure) {
-            let formData = new FormData();
-            formData.append('image', blobInfo.blob(), blobInfo.filename());
-            formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
-
-            fetch('/teacher/upload-image', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log(result.location);
-                if (result.location) {
-                    success(result.location); // Kirim URL gambar kembali ke editor
-                } else {
-                    failure('Upload gagal');
-                }
-            })
-            .catch(() => failure('Upload error'));
-        }
+        images_upload_url: '/upload-image', // ✅ Pastikan ini ada agar TinyMCE tidak pakai Base64
+        automatic_uploads: true, // ✅ Pastikan ini aktif
+        images_reuse_filename: true // ✅ Gunakan nama file yang sama untuk cache
     });
 
     // tinymce editor jawaban

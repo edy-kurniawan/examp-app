@@ -18,24 +18,27 @@ class QuestionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('teacher.question.create');
+        return view('teacher.question.create', [
+            'exam_id' => $request->exam_id
+        ]);
     }
 
     public function uploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:8048',
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:8048',
         ]);
 
-        $imageName = time().'.'.$request->image->extension();
-        $request->image->move(public_path('images'), $imageName);
+        $file = $request->file('file');
+        $imageName = time() . '.' . $file->extension();
+
+        $path = $file->storeAs('question', $imageName, 'public');
 
         return response()->json([
-            'success' => 'You have successfully uploaded an image',
-            'location' => asset('images/'.$imageName)
-        ],200, ['Content-Type' => 'application/json']);
+            'location' => asset('storage/' . $path) 
+        ]);
     }
 
     /**
@@ -44,7 +47,7 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         return $request->all();
-
+        
         $validated = $request->validate([
             'title' => 'required|unique:posts|max:255',
             'body' => 'required',

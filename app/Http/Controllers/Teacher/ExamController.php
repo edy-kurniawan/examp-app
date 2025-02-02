@@ -52,7 +52,9 @@ class ExamController extends Controller
      */
     public function show(string $id)
     {
-        return view('teacher.exam.show');
+        return view('teacher.exam.show', [
+            'exam_id' => $id
+        ]);
     }
 
     /**

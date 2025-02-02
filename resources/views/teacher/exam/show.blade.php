@@ -23,9 +23,19 @@
     <div class="row">
         <div class="col-xl-3 col-lg-4">
             <div class="card">
-                <h5 class="card-header bg-white text-center border-bottom">
-                    INFORMASI UJIAN
-                </h5>
+                <div class="d-flex justify-content-between border-bottom">
+                    <div class="bd-highlight">
+                        
+                    </div>
+                    <div class="bd-highlight">
+                        <h5 class="card-header bg-white text-center ms-4">
+                            INFORMASI UJIAN
+                        </h5>
+                    </div>
+                    <div class="bd-highlight mt-2 me-2">
+                        <a href="#"><i class="fas fa-cog font-size-24"></i></a>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Nama Ujian</label>
@@ -43,9 +53,19 @@
                             value="2021-08-01T10:00" disabled>
                     </div>
                 </div>
-                <h5 class="card-header bg-white text-center border-bottom">
-                    INFORMASI PAKET SOAL
-                </h5>
+                <div class="d-flex justify-content-between border-bottom">
+                    <div class="bd-highlight">
+                        
+                    </div>
+                    <div class="bd-highlight">
+                        <h5 class="card-header bg-white text-center ms-4">
+                            INFORMASI PAKET SOAL
+                        </h5>
+                    </div>
+                    <div class="bd-highlight mt-2 me-2">
+                        <a href="#"><i class="fas fa-cog font-size-24"></i></a>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-xl-12">
@@ -105,7 +125,7 @@
                     <div class="col-6 my-2 mr-2">
                         <div class="d-flex flex-row-reverse bd-highlight">
                             <div class="p-1 bd-highlight">
-                                <a href="{{ route('teacher.question.create')}}" class="btn btn-primary btn-sm me-2">
+                                <a href="{{ route('teacher.question.create', ['exam_id' => $exam_id]) }}" class="btn btn-primary btn-sm me-2">
                                     <i class="fas fa-plus"></i>
                                     Tambah Soal
                                 </a>
