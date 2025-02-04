@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
+use App\Models\Answer;
 use Illuminate\Http\Request;
+use App\Models\Exam;
+use App\Models\Question;
+use Illuminate\Support\Facades\DB;
 
 class QuestionController extends Controller
 {
@@ -20,8 +24,10 @@ class QuestionController extends Controller
      */
     public function create(Request $request)
     {
+        $exam = Exam::find($request->exam_id);
+
         return view('teacher.question.create', [
-            'exam_id' => $request->exam_id
+            'exam' => $exam
         ]);
     }
 
@@ -37,7 +43,7 @@ class QuestionController extends Controller
         $path = $file->storeAs('question', $imageName, 'public');
 
         return response()->json([
-            'location' => asset('storage/' . $path) 
+            'location' => url('public/storage/' . $path)
         ]);
     }
 
@@ -46,12 +52,75 @@ class QuestionController extends Controller
      */
     public function store(Request $request)
     {
-        return $request->all();
-        
-        $validated = $request->validate([
-            'title' => 'required|unique:posts|max:255',
-            'body' => 'required',
-        ]);
+
+        $exam_id = $request->exam_id;
+        $question = $request->soal;
+        $group_id = 1;
+        $question_type = $request->jenis_soal;
+        $weight = $request->bobot_soal;
+
+        DB::beginTransaction();
+
+        try {
+
+            // count question
+            $find = Question::where('exam_id', $exam_id)->count();
+
+            $data = Question::create([
+                'exam_id'   => $exam_id,
+                'group_id'  => $group_id,
+                'question_type' => $question_type,
+                'question_title' => 'Soal No ' . ($find + 1),
+                'question_content' => json_encode($question),
+                'correction_mode' => $request->penilaian_otomatis,
+                'weight' => $weight
+            ]);
+
+            if($question_type == 'multiple_choice') {
+
+                Answer::create([
+                    'question_id' => $data->id,
+                    'label' => 'a',
+                    'answer_text' => $request->jawaban_a,
+                    'is_correct' => $request->is_true == 'a' ? 1 : 0,
+                    'weight' => 10
+                ]);
+    
+                Answer::create([
+                    'question_id' => $data->id,
+                    'label' => 'b',
+                    'answer_text' => $request->jawaban_b,
+                    'is_correct' => $request->is_true == 'b' ? 1 : 0,
+                    'weight' => 10
+                ]);
+    
+                Answer::create([
+                    'question_id' => $data->id,
+                    'label' => 'c',
+                    'answer_text' => $request->jawaban_c,
+                    'is_correct' => $request->is_true == 'c' ? 1 : 0,
+                    'weight' => 10
+                ]);
+    
+                Answer::create([
+                    'question_id' => $data->id,
+                    'label' => 'd',
+                    'answer_text' => $request->jawaban_d,
+                    'is_correct' => $request->is_true == 'd' ? 1 : 0,
+                    'weight' => 10
+                ]);
+
+            }
+
+
+            DB::commit();
+
+            return redirect()->route('teacher.exam.show', $exam_id)->with('success', 'Soal berhasil ditambahkan');
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menambahkan soal');
+        }
     }
 
     /**

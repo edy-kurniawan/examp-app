@@ -159,7 +159,7 @@
                         <ul class="navbar-nav">
 
                             <li class="nav-item">
-                                <a class="nav-link arrow-none" href="https://posyandu.connectis.my.id/admin/dashboard" id="topnav-dashboard"
+                                <a class="nav-link arrow-none" href="#" id="topnav-dashboard"
                                     role="button">
                                     <i class="fas fa-tachometer-alt"></i>
                                     <span>Dashboards</span>
@@ -167,7 +167,7 @@
                             </li>
                             
                             <li class="nav-item">
-                                <a class="nav-link arrow-none" href="https://posyandu.connectis.my.id/admin/kader" id="topnav-dashboard"
+                                <a class="nav-link arrow-none" href="{{ route('teacher.exam.index') }}" id="topnav-dashboard"
                                     role="button">
                                     <i class="fas fa-book-open"></i>
                                     <span>Ujian</span>
@@ -175,7 +175,7 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link arrow-none" href="https://posyandu.connectis.my.id/admin/kader" id="topnav-dashboard"
+                                <a class="nav-link arrow-none" href="#" id="topnav-dashboard"
                                     role="button">
                                     <i class="fas fa-user-nurse"></i>
                                     <span>Pengawas</span>
@@ -183,7 +183,7 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link arrow-none" href="https://posyandu.connectis.my.id/admin/sasaran" id="topnav-dashboard"
+                                <a class="nav-link arrow-none" href="#" id="topnav-dashboard"
                                     role="button">
                                     <i class="fas fa-users"></i>
                                     <span>Siswa</span>

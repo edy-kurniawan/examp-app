@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Exam;
+use App\Models\Question;
 
 class ExamController extends Controller
 {
@@ -52,8 +53,13 @@ class ExamController extends Controller
      */
     public function show(string $id)
     {
+        $question = Question::select('id', 'exam_id', 'group_id', 'question_type', 'question_title', 'question_content', 'correction_mode', 'weight')
+                    ->where('exam_id', $id)
+                    ->get();
+
         return view('teacher.exam.show', [
-            'exam_id' => $id
+            'exam_id' => $id,
+            'questions' => $question
         ]);
     }
 

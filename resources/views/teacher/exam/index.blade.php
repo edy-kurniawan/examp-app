@@ -23,7 +23,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Paket Soal</label>
-                        <input type="text" class="form-control" name="package_name" id="package_name" placeholder="Masukkan Nama Paket Soal">
+                        <select name="package_name" id="package_name" class="form-control">
+                            <option value="Paket A">Paket A</option>
+                            <option value="Paket B">Paket B</option>
+                            <option value="Paket C">Paket C</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -81,8 +85,9 @@
                         <div class="col-xxl-3 col-lg-3">
                             <select name="paket_soal" class="form-control select2">
                                 <option value="all" selected>-- Semua Paket Soal --</option>
-                                <option value="1">Paket Soal 1</option>
-                                <option value="2">Paket Soal 2</option>
+                                <option value="Paket A">Paket A</option>
+                                <option value="Paket B">Paket B</option>
+                                <option value="Paket C">Paket C</option>
                             </select>
                         </div>
                         <div class="col-xxl-3 col-lg-3">

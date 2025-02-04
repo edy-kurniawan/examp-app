@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Buat Soal Ujian</h4>
+                <h4 class="mb-sm-0 font-size-18">Buat Soal Ujian | {{ $exam->exam_name }}</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item active">Anda dapat membuat soal ujian disini</li>
@@ -22,7 +22,7 @@
 
     <form method="POST" action="{{ route('teacher.question.store')}}">
     @csrf
-    <input type="hidden" name="exam_id" value="{{ $exam_id }}">
+    <input type="hidden" name="exam_id" value="{{ $exam->id }}">
     <div class="row">
         <div class="col-xl-9 col-lg-8">
             <div class="card">
@@ -63,7 +63,9 @@
                         <div>
                             <div class="row justify-content-center">
                                 <div class="col-xl-12">
-                                        <textarea name="soal" id="elm1">&lt;p&gt;Welcome to the TinyMCE jQuery example!&lt;/p&gt;</textarea>
+                                        <textarea name="soal" id="elm1">
+                                            Masukan soal disini
+                                        </textarea>
                                 </div>
                             </div>
                         </div>
@@ -72,7 +74,7 @@
                     <div class="tab-pane" id="archive" role="tabpanel">
                         <div>
                             <div class="row justify-content-center">
-                                <div class="col-xl-12">
+                                <div class="col-xl-12 class-pilihan-ganda">
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
@@ -117,6 +119,28 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <div class="col-12 class-isian-singkat">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="mb-3">
+                                                <label for="formrow-firstname-input" class="form-label">Mimimal Karakter</label>
+                                                <input type="number" class="form-control" name="minimal_karakter" id="formrow-firstname-input" value="60">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="mb-3">
+                                                <label for="formrow-firstname-input" class="form-label">Maksimal Karakter</label>
+                                                <input type="number" class="form-control" name="maksimal_karakter" id="formrow-firstname-input" value="100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 class-esai">
+                                    <div class="mb-3">
+                                        <label for="formrow-firstname-input" class="form-label">Mimimal Karakter</label>
+                                        <input type="number" class="form-control" name="minimal_karakter" id="formrow-firstname-input" value="100">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -133,23 +157,23 @@
                 <div class="card-body p-4">
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Jenis Soal</label>
-                        <select class="form-select" id="formrow-firstname-input">
-                            <option value="1">Pilihan Ganda</option>
-                            <option value="2">Isian Singkat</option>
-                            <option value="3">Esai</option>
+                        <select class="form-select" id="formrow-firstname-input" name="jenis_soal">
+                            <option value="multiple_choice">Pilihan Ganda</option>
+                            <option value="short_answer">Isian Singkat</option>
+                            <option value="essay">Esai</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Bobot Soal</label>
                         <div class="input-group">
-                            <input type="number" class="form-control" name="" id="formrow-firstname-input" value="1">
+                            <input type="number" class="form-control" name="bobot_soal" id="formrow-firstname-input" value="1">
                             <div class="input-group-text">%</div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="formrow-firstname-input" class="form-label">Penilaian Otomatis</label>
                         <div>
-                            <input type="checkbox" id="switch1" switch="none" checked />
+                            <input type="checkbox" id="switch1" switch="none" name="penilaian_otomatis" checked>
                             <label for="switch1" data-on-label="On" data-off-label="Off"></label>
                         </div>
                     </div>
@@ -174,6 +198,11 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        // hide class pilihan ganda, isian singkat, esai
+        $('.class-pilihan-ganda').show();
+        $('.class-isian-singkat').hide();
+        $('.class-esai').hide();
     });
 
     // tinymce editor soal
@@ -198,8 +227,9 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
+                        console.log(response);
                         if (response.location) {
-                            resolve(response.location); // ✅ TinyMCE menggunakan URL, bukan Base64
+                            resolve(response.location);
                         } else {
                             reject('Gagal mengunggah gambar');
                         }
@@ -210,9 +240,9 @@
                 });
             });
         },
-        images_upload_url: '/upload-image', // ✅ Pastikan ini ada agar TinyMCE tidak pakai Base64
-        automatic_uploads: true, // ✅ Pastikan ini aktif
-        images_reuse_filename: true // ✅ Gunakan nama file yang sama untuk cache
+        images_upload_url: '/upload-image',
+        automatic_uploads: true,
+        images_reuse_filename: true
     });
 
     // tinymce editor jawaban
@@ -223,6 +253,24 @@
             plugins: 'advlist autolink lists link charmap preview',
             toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
         });
+    });
+
+    // jenis soal
+    $('select[name="jenis_soal"]').on('change', function() {
+        var jenis_soal = $(this).val();
+        if (jenis_soal == 'multiple_choice') {
+            $('.class-pilihan-ganda').show();
+            $('.class-isian-singkat').hide();
+            $('.class-esai').hide();
+        } else if (jenis_soal == 'short_answer') {
+            $('.class-pilihan-ganda').hide();
+            $('.class-isian-singkat').show();
+            $('.class-esai').hide();
+        } else if (jenis_soal == 'essay') {
+            $('.class-pilihan-ganda').hide();
+            $('.class-isian-singkat').hide();
+            $('.class-esai').show();
+        }
     });
 </script>
 @endsection
