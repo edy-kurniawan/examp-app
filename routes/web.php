@@ -5,7 +5,7 @@ use App\Http\Controllers\Teacher\ExamController;
 use App\Http\Controllers\Teacher\QuestionController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/teacher/exam');
 });
 
 Route::middleware([
