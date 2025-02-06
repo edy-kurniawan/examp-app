@@ -177,16 +177,16 @@
                             <li class="nav-item">
                                 <a class="nav-link arrow-none" href="#" id="topnav-dashboard"
                                     role="button">
-                                    <i class="fas fa-user-nurse"></i>
-                                    <span>Pengawas</span>
+                                    <i class="fas fa-users"></i>
+                                    <span>Siswa</span>
                                 </a>
                             </li>
 
                             <li class="nav-item">
                                 <a class="nav-link arrow-none" href="#" id="topnav-dashboard"
                                     role="button">
-                                    <i class="fas fa-users"></i>
-                                    <span>Siswa</span>
+                                    <i class="fas fa-user-nurse"></i>
+                                    <span>Pengawas</span>
                                 </a>
                             </li>
 
